@@ -21,39 +21,42 @@ purge RAM → Qwen 7B generates code from specs → 3-gate validation (integrity
 
 Each task is **one file, max 200 lines or ~200 words of specs**. Dependencies declared explicitly (`DEPENDS_ON`). Shared files (routes, configs, types) get a dedicated integration task.
 
-## Practical Example (Conversation Flow)
+## Practical Example
 
-🗣️ **User:** "Add a red delete button to the user profile page"
+> **User says:** "Add a red delete button to the user profile page"
 
-DeepSeek reads the file and responds with the atomic plan:
+**DeepSeek reads the file** → produces this atomic plan:
 
-🤖 **DeepSeek:**
 ```
 ## FILE: src/app/components/ProfileForm.tsx
 
 ### TASK: Add a red delete button
+FILES: [modify: src/app/components/ProfileForm.tsx]
 
 #### EXISTING CODE
+```tsx
 <Button variant="primary">Save</Button>
+```
 
 #### SPECS (EARS format)
 - WHEN user clicks THE delete button SHALL call `onDelete()` prop
-- THE button SHALL display "Delete Account"
-- THE button SHALL have backgroundColor "#dc2626" and color "#fff"
+- THE button SHALL display the text "Delete Account"
+- THE button SHALL have style `backgroundColor: "#dc2626"` and `color: "#fff"`
 - IF `onDelete` is not provided THE button SHALL NOT render
 - SHALL NOT add imports or modify any other component
 
 #### CONSTRAINTS
 - Keep existing Button import
+- Only modify the return block, nothing else
 ```
 
-> ¿Delegar a Qwen local? ✅ Sí — tarea pequeña, specs claras, sin juicio de diseño
+**DeepSeek asks:**
+> "¿Delegar a Qwen local? ✅ Sí — tarea pequeña (~30 tokens de output), specs claras, 1 archivo, sin juicio de diseño"
 
-🗣️ **User:** "Sí"
+**User says Sí** → `sudo purge` → Qwen generates the code → 3-gate validation passes → applied.
 
-→ `sudo purge` → Qwen generates code from specs → 3-gate validation → applied
-
-🤖 **DeepSeek:** "Done! ~120 tokens saved locally (~$0.0001)"
+**Report:**
+> "Done! ~120 tokens saved locally (~$0.0001)"
 
 ## What It Saves
 
